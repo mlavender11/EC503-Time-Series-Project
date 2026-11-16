@@ -16,20 +16,20 @@ y = genTrend + genCycle + genSeason + genNoise; % generated signal
 
 
 %%  Estimate comps
-% [LT, estSeason, estNoise] = trenddecomp(y, 'stl', s);
-% [p, ~, mu]  = polyfit(t, LT, 2);
-% estTrend  = polyval(p, t, [], mu); % Estimated trend
-% estCycle  = LT - estTrend;
-
 [~, ST] = trenddecomp(y, "stl", s);
-yDS = y - ST;                       % contains trend + cycle + noise
+estSeason = ST;                          % seasonal component
+yDS = y - ST;                            % trend + cycle + noise
 
-w   = [0.5; ones(s-1,1); 0.5] / s; 
-TC  = conv(yDS, w, 'same');
-TC([1:s/2, end-s/2+1:end]) = NaN;
+w  = [0.5; ones(s-1,1); 0.5] / s;        % 2x12 centered MA
+TC = conv(yDS, w, 'same');
+TC([1:s/2, end-s/2+1:end]) = NaN;        % edge values are biased
 
+% HP filter on the valid portion only, then re-embed at full length
 ok = ~isnan(TC);
-[estTrend, estCycle] = hpfilter(TC(ok), Smoothing=129600);   % Econometrics Toolbox
+estTrend = NaN(N,1);  estCycle = NaN(N,1);
+[estTrend(ok), estCycle(ok)] = hpfilter(TC(ok), Smoothing=129600);
+
+estNoise = yDS - TC;                     % residual (NaN at the edges)
 
 %% Plot
 
