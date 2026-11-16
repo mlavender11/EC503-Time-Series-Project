@@ -3,7 +3,8 @@
 %[text] 
 %[text] TODO 
 %[text] - Add in holiday indicator? As is, the model can't capture the spike during the holidays (late dec, early jan)
-%[text] - Add in a day of week dummy variable \
+%[text] - Add in a day of week dummy variable
+%[text] - implement rolling forecast \
 clear; clc; close all
 %%
 %[text] Load dataset
